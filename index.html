@@ -1,17 +1,46 @@
+лимб, [18.12.2024 14:52]
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meeting Groups</title>
+    <title>Show Match Tournament</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background: radial-gradient(circle at top, #0d1b2a, #1b263b, #415a77);
             color: white;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
-
+        .snowflake {
+            position: fixed;
+            top: -10px;
+            color: white;
+            font-size: 1em;
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+        .tournament-header {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+        }
+        .tournament-bracket {
+            margin: 20px auto;
+            max-width: 800px;
+        }
         .registration-form, .participant-list {
             margin: 20px auto;
             max-width: 400px;
@@ -20,34 +49,31 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-
         .card-body {
             padding: 20px;
             color: white;
         }
-
         .btn-primary {
             background-color: #778da9;
             border-color: #778da9;
         }
-
         .btn-primary:hover {
             background-color: #506d8b;
             border-color: #506d8b;
         }
-
         .list-group-item {
             background-color: #1b263b;
             color: white;
             border: 1px solid #415a77;
         }
-
         .list-group-item.text-center {
             color: white;
         }
-
         .bg-light {
             background-color: #1b263b !important;
+            color: white;
+        }
+        .tournament-bracket h2 {
             color: white;
         }
     </style>
@@ -55,97 +81,107 @@
 <body>
     <div class="container">
         <!-- Header -->
-        <header class="text-center my-4">
-            <h1>Meeting Groups</h1>
-            <p>Register to join a group and meet like-minded people!</p>
+        <header class="tournament-header">
+            <h1>Show Match Tournament</h1>
+            <p>Register to participate in exciting matches of CS2 or Dota!</p>
         </header>
 
         <!-- Registration Form -->
         <section class="registration-form card">
             <div class="card-body">
-                <h2 class="card-title text-center">Join a Group</h2>
+                <h2 class="card-title text-center">Player Registration</h2>
                 <form id="registration-form">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Your Name</label>
-                        <input type="text" id="name" class="form-control" placeholder="Enter your name" required>
+                        <label for="nickname" class="form-label">Nickname</label>
+                        <input type="text" id="nickname" class="form-control" placeholder="Enter your nickname" required>
                     </div>
                     <div class="mb-3">
-                        <label for="category" class="form-label">Select Category</label>
-                        <select id="category" class="form-select" required>
-                            <option value="" disabled selected>Choose a category</option>
-                            <option value="dota">DOTA 2</option>
-                            <option value="cs2">CS 2</option>
+                        <label for="game" class="form-label">Game</label>
+                        <select id="game" class="form-select" required>
+                            <option value="" disabled selected>Choose a game</option>
+                            <option value="cs2">Counter-Strike 2</option>
+                            <option value="dota">Dota 2</option>
                         </select>
                     </div>
                     <button type="submit" id="register-btn" class="btn btn-primary w-100">Register</button>
+                    <p id="already-registered-message" class="text-center mt-3 text-warning" style="display: none;">You are already registered!</p>
                 </form>
             </div>
         </section>
 
-        <!-- Participant List -->
+лимб, [18.12.2024 14:52]
+<!-- Participant List -->
         <section class="participant-list card">
             <div class="card-body">
-                <h2 class="card-title text-center">Participants by Category</h2>
-                <div id="categories-container">
-                    <!-- Categories and participants will be dynamically added here -->
-                    <div id="dota" class="category">
-                        <h3>DOTA 2</h3>
-                        <ul id="dota-list" class="list-group"></ul>
-                    </div>
-                    <div id="cs2" class="category">
-                        <h3>CS 2</h3>
-                        <ul id="cs2-list" class="list-group"></ul>
-                    </div>
-                </div>
+                <h2 class="card-title text-center">Registered Participants</h2>
+                <ul id="participant-list" class="list-group">
+                    <li class="list-group-item text-center">No participants yet.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Tournament Bracket -->
+        <section class="tournament-bracket">
+            <h2 class="text-center">Tournament Bracket</h2>
+            <div id="bracket" class="bg-light p-4 rounded">
+                <p class="text-center">Bracket will be displayed here once registration closes.</p>
             </div>
         </section>
     </div>
 
+    <!-- Snowflake Animation -->
     <script>
-        // Load participants from localStorage on page load
-        window.onload = function() {
-            const participants = JSON.parse(localStorage.getItem('participants')) || [];
+        const createSnowflake = () => {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.textContent = '❄️';
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            snowflake.style.animationDuration = Math.random() * 5 + 5 + 's';
 
-            participants.forEach(participant => {
-                addParticipantToCategory(participant);
-            });
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 10000);
         };
+
+        setInterval(createSnowflake, 200);
 
         // Handle form submission
         document.getElementById('registration-form').addEventListener('submit', function(e) {
             e.preventDefault(); // Prevent form from submitting and page from refreshing
 
-            const name = document.getElementById('name').value;
-            const category = document.getElementById('category').value;
+            const nickname = document.getElementById('nickname').value;
+            const game = document.getElementById('game').value;
 
             // Check if the user has already registered
-            const participants = JSON.parse(localStorage.getItem('participants')) || [];
-            if (participants.some(participant => participant.name === name)) {
-                alert('You are already registered!');
+            if (localStorage.getItem('isRegistered')) {
+                document.getElementById('already-registered-message').style.display = 'block';
                 return; // Stop further processing
             }
 
-            // Add new participant to the array
-            const newParticipant = { name, category };
-            participants.push(newParticipant);
+            // Mark the user as registered by saving to localStorage
+            localStorage.setItem('isRegistered', 'true');
 
-            // Save updated participants array to localStorage
-            localStorage.setItem('participants', JSON.stringify(participants));
-
-            // Add participant to the correct category list
-            addParticipantToCategory(newParticipant);
-
-            // Reset the form
-            document.getElementById('registration-form').reset();
-        });
-
-        function addParticipantToCategory(participant) {
-            const categoryList = document.getElementById(`${participant.category}-list`);
+            // Create a new list item for the participant
             const participantItem = document.createElement('li');
-            participantItem.classList.add('list-group-item');
-            participantItem.textContent = participant.name;
-            categoryList.appendChild(participantItem);
-        }
+            participantItem.classList.add('list-group-item', 'text-center');
+            participantItem.textContent = ${nickname} - ${game === 'cs2' ? 'Counter-Strike 2' : 'Dota 2'};
+
+            // Append the new participant to the list
+            const participantList = document.getElementById('participant-list');
+            // Check if there's the placeholder item and remove it
+            if (participantList.firstChild.textContent === 'No participants yet.') {
+                participantList.firstChild.remove();
+            }
+            participantList.appendChild(participantItem);
+
+            // Disable the form fields and button to prevent re-registration
+            document.getElementById('nickname').disabled = true;
+            document.getElementById('game').disabled = true;
+            document.getElementById('register-btn').disabled = true;
+        });
         // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
