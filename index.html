@@ -78,7 +78,6 @@
                         </select>
                     </div>
                     <button type="submit" id="register-btn" class="btn btn-primary w-100">Register</button>
-                    <p id="already-registered-message" class="text-center mt-3 text-warning" style="display: none;">You are already registered!</p>
                 </form>
             </div>
         </section>
@@ -106,17 +105,7 @@
         // Load participants from localStorage on page load
         window.onload = function() {
             const participants = JSON.parse(localStorage.getItem('participants')) || [];
-            const name = localStorage.getItem('userName'); // Get user's name if already registered
 
-            if (name) {
-                // If the user is already registered, show their name and prevent re-registration
-                document.getElementById('already-registered-message').style.display = 'block';
-                document.getElementById('name').disabled = true;
-                document.getElementById('category').disabled = true;
-                document.getElementById('register-btn').disabled = true;
-            }
-
-            // Render all participants for DOTA 2 and CS 2 categories
             participants.forEach(participant => {
                 addParticipantToCategory(participant);
             });
@@ -132,12 +121,9 @@
             // Check if the user has already registered
             const participants = JSON.parse(localStorage.getItem('participants')) || [];
             if (participants.some(participant => participant.name === name)) {
-                document.getElementById('already-registered-message').style.display = 'block';
+                alert('You are already registered!');
                 return; // Stop further processing
             }
-
-            // Save user name to localStorage to prevent re-registration
-            localStorage.setItem('userName', name);
 
             // Add new participant to the array
             const newParticipant = { name, category };
@@ -149,10 +135,8 @@
             // Add participant to the correct category list
             addParticipantToCategory(newParticipant);
 
-            // Disable form inputs and button
-            document.getElementById('name').disabled = true;
-            document.getElementById('category').disabled = true;
-            document.getElementById('register-btn').disabled = true;
+            // Reset the form
+            document.getElementById('registration-form').reset();
         });
 
         function addParticipantToCategory(participant) {
