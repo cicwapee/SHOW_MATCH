@@ -152,6 +152,7 @@
             const participantList = document.getElementById('participant-list');
             participantList.innerHTML = ''; // Clear the existing list
 
+            // If no participants, display a placeholder
             if (participants.length === 0) {
                 participantList.innerHTML = '<li class="list-group-item text-center">No participants yet.</li>';
             } else {
